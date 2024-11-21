@@ -16,9 +16,11 @@ interface ColumnProps {
     };
   };
   onAddTask: (columnId: string) => void;
+  onDeleteTask: (taskId: string) => void;
+  onEditTask: (taskId: string, newTitle: string) => void;
 }
 
-const Column = ({ column, tasks, onAddTask }: ColumnProps) => {
+const Column = ({ column, tasks, onAddTask, onDeleteTask, onEditTask }: ColumnProps) => {
   return (
     <div className="bg-muted/50 p-4 rounded-lg w-80">
       <div className="flex justify-between items-center mb-4">
@@ -42,7 +44,13 @@ const Column = ({ column, tasks, onAddTask }: ColumnProps) => {
             }`}
           >
             {column.taskIds.map((taskId, index) => (
-              <TaskCard key={taskId} task={tasks[taskId]} index={index} />
+              <TaskCard
+                key={taskId}
+                task={tasks[taskId]}
+                index={index}
+                onDelete={onDeleteTask}
+                onEdit={onEditTask}
+              />
             ))}
             {provided.placeholder}
           </div>

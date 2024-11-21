@@ -120,6 +120,42 @@ const Index = () => {
     toast.success("Task added successfully!");
   };
 
+  const handleDeleteTask = (taskId: string) => {
+    const newTasks = { ...data.tasks };
+    delete newTasks[taskId];
+
+    const newColumns = { ...data.columns };
+    Object.keys(newColumns).forEach((columnId) => {
+      newColumns[columnId] = {
+        ...newColumns[columnId],
+        taskIds: newColumns[columnId].taskIds.filter((id) => id !== taskId),
+      };
+    });
+
+    setData({
+      ...data,
+      tasks: newTasks,
+      columns: newColumns,
+    });
+
+    toast.success("Task deleted successfully!");
+  };
+
+  const handleEditTask = (taskId: string, newTitle: string) => {
+    setData({
+      ...data,
+      tasks: {
+        ...data.tasks,
+        [taskId]: {
+          ...data.tasks[taskId],
+          title: newTitle,
+        },
+      },
+    });
+
+    toast.success("Task updated successfully!");
+  };
+
   return (
     <div className="min-h-screen p-8">
       <h1 className="text-3xl font-bold text-gray-900 mb-8">My Trello Board</h1>
@@ -133,6 +169,8 @@ const Index = () => {
                 column={column}
                 tasks={data.tasks}
                 onAddTask={handleAddTask}
+                onDeleteTask={handleDeleteTask}
+                onEditTask={handleEditTask}
               />
             );
           })}
