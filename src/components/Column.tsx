@@ -2,6 +2,7 @@ import { Droppable } from "@hello-pangea/dnd";
 import TaskCard from "./TaskCard";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
+import type { LabelType } from "./Navbar";
 
 interface ColumnProps {
   column: {
@@ -13,14 +14,25 @@ interface ColumnProps {
     [key: string]: {
       id: string;
       title: string;
+      labels?: string[];
     };
   };
   onAddTask: (columnId: string) => void;
   onDeleteTask: (taskId: string) => void;
   onEditTask: (taskId: string, newTitle: string) => void;
+  labels: LabelType[];
+  onAddLabelToTask: (taskId: string, labelId: string) => void;
 }
 
-const Column = ({ column, tasks, onAddTask, onDeleteTask, onEditTask }: ColumnProps) => {
+const Column = ({ 
+  column, 
+  tasks, 
+  onAddTask, 
+  onDeleteTask, 
+  onEditTask,
+  labels,
+  onAddLabelToTask 
+}: ColumnProps) => {
   return (
     <div className="bg-muted/50 p-4 rounded-lg w-80">
       <div className="flex justify-between items-center mb-4">
@@ -50,6 +62,8 @@ const Column = ({ column, tasks, onAddTask, onDeleteTask, onEditTask }: ColumnPr
                 index={index}
                 onDelete={onDeleteTask}
                 onEdit={onEditTask}
+                labels={labels}
+                onAddLabelToTask={onAddLabelToTask}
               />
             ))}
             {provided.placeholder}

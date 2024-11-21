@@ -2,6 +2,17 @@ import { useState } from "react";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import Column from "@/components/Column";
 import { toast } from "sonner";
+import Navbar, { LabelType } from "@/components/Navbar";
+
+interface Task {
+  id: string;
+  title: string;
+  labels?: string[];
+}
+
+interface TaskState {
+  [key: string]: Task;
+}
 
 const initialData = {
   tasks: {
@@ -32,6 +43,7 @@ const initialData = {
 
 const Index = () => {
   const [data, setData] = useState(initialData);
+  const [labels, setLabels] = useState<LabelType[]>([]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -96,6 +108,7 @@ const Index = () => {
     const newTask = {
       id: newTaskId,
       title: `New task ${Object.keys(data.tasks).length + 1}`,
+      labels: [],
     };
 
     const column = data.columns[columnId];
@@ -156,26 +169,54 @@ const Index = () => {
     toast.success("Task updated successfully!");
   };
 
+  const handleAddLabel = (label: LabelType) => {
+    setLabels([...labels, label]);
+  };
+
+  const handleAddLabelToTask = (taskId: string, labelId: string) => {
+    const task = data.tasks[taskId];
+    const updatedLabels = [...(task.labels || [])];
+    
+    if (!updatedLabels.includes(labelId)) {
+      updatedLabels.push(labelId);
+      setData({
+        ...data,
+        tasks: {
+          ...data.tasks,
+          [taskId]: {
+            ...task,
+            labels: updatedLabels,
+          },
+        },
+      });
+      toast.success("Label added to task!");
+    }
+  };
+
   return (
-    <div className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">My Trello Board</h1>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6">
-          {data.columnOrder.map((columnId) => {
-            const column = data.columns[columnId];
-            return (
-              <Column
-                key={column.id}
-                column={column}
-                tasks={data.tasks}
-                onAddTask={handleAddTask}
-                onDeleteTask={handleDeleteTask}
-                onEditTask={handleEditTask}
-              />
-            );
-          })}
-        </div>
-      </DragDropContext>
+    <div className="min-h-screen">
+      <Navbar labels={labels} onAddLabel={handleAddLabel} />
+      <div className="p-8">
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="flex gap-6">
+            {data.columnOrder.map((columnId) => {
+              const column = data.columns[columnId];
+              return (
+                <Column
+                  key={column.id}
+                  column={column}
+                  tasks={data.tasks}
+                  onAddTask={handleAddTask}
+                  onDeleteTask={handleDeleteTask}
+                  onEditTask={handleEditTask}
+                  labels={labels}
+                  onAddLabelToTask={handleAddLabelToTask}
+                />
+              );
+            })}
+          </div>
+        </DragDropContext>
+      </div>
     </div>
   );
 };
